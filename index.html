@@ -1,6 +1,14 @@
 <!doctype html>
 <html lang="ru">
  <head>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+</script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DarkPay - Secure Digital Marketplace</title>
@@ -1649,29 +1657,14 @@
     }
 
     // LocalStorage управление
-    const storage = {
-      getUser: () => JSON.parse(localStorage.getItem('darkpay_user')),
-      setUser: (user) => localStorage.setItem('darkpay_user', JSON.stringify(user)),
-      removeUser: () => localStorage.removeItem('darkpay_user'),
-      getAllUsers: () => JSON.parse(localStorage.getItem('darkpay_users')) || {},
-      saveUser: (username, password) => {
-        const users = storage.getAllUsers();
-        const role = storage.getDefaultRole();
-        users[username] = { 
-          password, 
-          balance: 100.00, 
-          registeredAt: Date.now(), 
-          role: role.id,
-          transactions: [],
-          purchases: []
-        };
-        localStorage.setItem('darkpay_users', JSON.stringify(users));
+    
+        // localStorage removed));
       },
       updateUserData: (username, data) => {
         const users = storage.getAllUsers();
         if (users[username]) {
           users[username] = { ...users[username], ...data };
-          localStorage.setItem('darkpay_users', JSON.stringify(users));
+          // localStorage removed));
         }
       },
       checkUser: (username, password) => {
@@ -1682,8 +1675,8 @@
         const users = storage.getAllUsers();
         return !!users[username];
       },
-      getProducts: () => JSON.parse(localStorage.getItem('darkpay_products')) || [],
-      saveProducts: (products) => localStorage.setItem('darkpay_products', JSON.stringify(products)),
+      getProducts: () => JSON.parse(// localStorage removed)) || [],
+      saveProducts: (products) => // localStorage removed)),
       addProduct: (product) => {
         const products = storage.getProducts();
         products.push(product);
@@ -1694,8 +1687,8 @@
         const filtered = products.filter(p => p.id !== productId);
         storage.saveProducts(filtered);
       },
-      getTickets: () => JSON.parse(localStorage.getItem('darkpay_tickets')) || [],
-      saveTickets: (tickets) => localStorage.setItem('darkpay_tickets', JSON.stringify(tickets)),
+      getTickets: () => JSON.parse(// localStorage removed)) || [],
+      saveTickets: (tickets) => // localStorage removed)),
       addTicket: (ticket) => {
         const tickets = storage.getTickets();
         tickets.push(ticket);
@@ -1709,8 +1702,8 @@
           storage.saveTickets(tickets);
         }
       },
-      getRoles: () => JSON.parse(localStorage.getItem('darkpay_roles')) || storage.initDefaultRoles(),
-      saveRoles: (roles) => localStorage.setItem('darkpay_roles', JSON.stringify(roles)),
+      getRoles: () => JSON.parse(// localStorage removed)) || storage.initDefaultRoles(),
+      saveRoles: (roles) => // localStorage removed)),
       addRole: (role) => {
         const roles = storage.getRoles();
         roles.push(role);
@@ -1738,8 +1731,8 @@
         storage.saveRoles(defaultRoles);
         return defaultRoles;
       },
-      getMessages: () => JSON.parse(localStorage.getItem('darkpay_messages')) || [],
-      saveMessages: (messages) => localStorage.setItem('darkpay_messages', JSON.stringify(messages)),
+      getMessages: () => JSON.parse(// localStorage removed)) || [],
+      saveMessages: (messages) => // localStorage removed)),
       addMessage: (message) => {
         const messages = storage.getMessages();
         messages.push(message);
@@ -2092,7 +2085,7 @@
           transactions: [],
           purchases: []
         };
-        localStorage.setItem('darkpay_users', JSON.stringify(users));
+        // localStorage removed));
       }
     }
 
@@ -3279,5 +3272,69 @@
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99bd93f2967a2aa2',t:'MTc2MjY5NDExNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99bd93f2967a2aa2',t:'MTc2MjY5NDExNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<script>
+// ---- Remote API ----
+function api(action, data = {}) {
+    Telegram.WebApp.sendData(JSON.stringify({ action, ...data }));
+}
+
+// ---- Storage Replacement ----
+const storage = {
+    getUser() { return window.__remote_user || null; },
+    setUser(data) { api("set_user", { data }); window.__remote_user = data; },
+    removeUser() { api("remove_user"); window.__remote_user = null; },
+
+    getUsers() { return window.__remote_users || {}; },
+    setUsers(list) { api("set_users", { list }); window.__remote_users = list; },
+    getAllUsers() { return window.__remote_users || {}; },
+    saveUser(u, p) {
+        const users = storage.getAllUsers();
+        const role = storage.getDefaultRole();
+        users[u] = { password: p, balance: 100, registeredAt: Date.now(), role: role.id, transactions: [], purchases: [] };
+        storage.setUsers(users);
+    },
+    updateUserData(username, patch) {
+        api("update_user", { username, patch });
+        const users = storage.getAllUsers();
+        if (users[username]) { users[username] = { ...users[username], ...patch }; window.__remote_users = users; }
+    },
+    checkUser(u,p){ const users=storage.getAllUsers(); return users[u] && users[u].password===p; },
+    userExists(u){ return !!storage.getAllUsers()[u]; },
+
+    getProducts(){ return window.__remote_products || []; },
+    addProduct(item){ api("add_product", item); const p=storage.getProducts(); p.push(item); window.__remote_products=p; },
+    deleteProduct(id){ api("delete_product",{id}); window.__remote_products=storage.getProducts().filter(x=>x.id!==id); },
+    updateProduct(id,data){ api("update_product",{id,data}); },
+
+    getTickets(){ return window.__remote_tickets || []; },
+    addTicket(t){ api("add_ticket",t); const arr=storage.getTickets(); arr.push(t); window.__remote_tickets=arr; },
+    updateTicket(id,patch){ api("update_ticket",{id,patch}); const t=storage.getTickets(); const i=t.findIndex(x=>x.id===id); if(i!=-1){ t[i]={...t[i],...patch}; window.__remote_tickets=t;} },
+
+    getMessages(){ return window.__remote_messages || []; },
+    addMessage(m){ api("add_message",m); const mlist=storage.getMessages(); mlist.push(m); window.__remote_messages=mlist; },
+
+    getRoles(){ return window.__remote_roles || storage.initDefaultRoles(); },
+    addRole(r){ api("add_role",r); const roles=storage.getRoles(); roles.push(r); window.__remote_roles=roles; },
+    updateRole(id,patch){ api("update_role",{id,patch}); },
+
+    getDefaultRole(){ return storage.getRoles().find(r=>r.id==='user'); },
+    initDefaultRoles(){
+        const def=[{id:'admin',name:'Администратор',color:'#ef4444',permissions:['manage_users','manage_products','manage_tickets','view_all_tickets','delete_products']},
+                   {id:'user',name:'Пользователь',color:'#6b7280',permissions:[]}];
+        window.__remote_roles=def; return def;
+    },
+
+    setRemoteData(payload){
+        if(payload.users) window.__remote_users=payload.users;
+        if(payload.products) window.__remote_products=payload.products;
+        if(payload.tickets) window.__remote_tickets=payload.tickets;
+        if(payload.messages) window.__remote_messages=payload.messages;
+        if(payload.roles) window.__remote_roles=payload.roles;
+        if(payload.user) window.__remote_user=payload.user;
+    }
+};
+</script>
+
+</body>
 </html>
